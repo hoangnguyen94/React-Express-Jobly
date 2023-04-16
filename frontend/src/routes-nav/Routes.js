@@ -7,59 +7,59 @@ import CompanyDetail from "../companies/CompanyDetail";
 import LoginForm from "../auth/LoginForm";
 import ProfileForm from "../profiles/ProfileForm";
 import SignupForm from "../auth/SignupForm";
-import PrivateRoute from "../PrivateRoute";
+import PrivateRoute from "./PrivateRoute";
 
-/**Site routes:
- * <PrivateRoute> need to log in to see
- * which is an auth components
- * 
- * visiting a non-existant route redirect to homepage
+/** Site-wide routes.
+ *
+ * Parts of site should only be visitable when logged in. Those routes are
+ * wrapped by <PrivateRoute>, which is an authorization component.
+ *
+ * Visiting a non-existant route redirects to the homepage.
  */
 
-const Routes = ( { login, signup } ) =>
-{
-    console.debug(
-        "Routes",
-        `login=${typeof login}`,
-        `register=${typeof register}`
-    )
+function Routes({ login, signup }) {
+  console.debug(
+      "Routes",
+      `login=${typeof login}`,
+      `register=${typeof register}`,
+  );
 
-    return (
-        <div className="pt-5">
-            <Switch>
+  return (
+      <div className="pt-5">
+        <Switch>
 
-                <Route exact path="/">
-                    <Homepage/>
-                </Route>
+          <Route exact path="/">
+            <Homepage />
+          </Route>
 
-                <Route exact path="/login">
-                    <LoginForm login={login}/>
-                </Route>
+          <Route exact path="/login">
+            <LoginForm login={login} />
+          </Route>
 
-                <Route exact path="/signup">
-                    <SignupForm login={signup}/>
-                </Route>
+          <Route exact path="/signup">
+            <SignupForm signup={signup} />
+          </Route>
 
-                <PrivateRoute exact path="/companies">
-                    <CompanyList/>
-                </PrivateRoute>
+          <PrivateRoute exact path="/companies">
+            <CompanyList />
+          </PrivateRoute>
 
-                <PrivateRoute exact path="/jobs">
-                    <JobList/>
-                </PrivateRoute>
+          <PrivateRoute exact path="/jobs">
+            <JobList />
+          </PrivateRoute>
 
-                <PrivateRoute exact path="/companies/:handle">
-                    <CompanyDetail/>
-                </PrivateRoute>
+          <PrivateRoute exact path="/companies/:handle">
+            <CompanyDetail />
+          </PrivateRoute>
 
-                <PrivateRoute exact path="/profile">
-                    <ProfileForm/>
-                </PrivateRoute>
+          <PrivateRoute path="/profile">
+            <ProfileForm />
+          </PrivateRoute>
 
-                <Redirect to="/"/>
-            </Switch>
-        </div>
-    )
+          <Redirect to="/" />
+        </Switch>
+      </div>
+  );
 }
 
 export default Routes;

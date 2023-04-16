@@ -3,7 +3,7 @@ import Alert from "../common/Alert";
 import JoblyApi from "../api/api";
 import UserContext from "../auth/UserContext";
 
-//eslint-disable-next-line
+// eslint-disable-next-line
 import useTimedMessage from "../hooks/useTimedMessage";
 
 /** Profile editing form.
@@ -20,149 +20,144 @@ import useTimedMessage from "../hooks/useTimedMessage";
  * Routes -> ProfileForm -> Alert
  */
 
-const ProfileForm = () =>
-{
-    const { currentUser, setCurrentUser } = useContext( UserContext );
-    const [ formData, setFormData ] = useState( {
-        firstName: currentUser.firstName,
-        lastName: currentUser.lastName,
-        email: currentUser.email,
-        username: currentUser.username,
-        password: ""
-    } );
+function ProfileForm() {
+  const { currentUser, setCurrentUser } = useContext(UserContext);
+  const [formData, setFormData] = useState({
+    firstName: currentUser.firstName,
+    lastName: currentUser.lastName,
+    email: currentUser.email,
+    username: currentUser.username,
+    password: "",
+  });
+  const [formErrors, setFormErrors] = useState([]);
 
-    //switch to use our limmited-time-display message hook
-    const [ saveConfirmed, setSaveConfirmed ] = useState( false );
+  // switch to use our fancy limited-time-display message hook
+  const [saveConfirmed, setSaveConfirmed] = useState(false);
+  // const [saveConfirmed, setSaveConfirmed] = useTimedMessage()
 
-    console.debug(
-        "ProfileForm",
-        "currentUser=", currentUser,
-        "formErrors=", formErrors,
-        "saveConfirmed=", saveConfirmed
-    );
+  console.debug(
+      "ProfileForm",
+      "currentUser=", currentUser,
+      "formData=", formData,
+      "formErrors=", formErrors,
+      "saveConfirmed=", saveConfirmed,
+  );
 
-    /** on form submit:
-     * - attempt save to backend & report any errors
-     * - if successful
-     *     -clear previous error messages and password
-     *     -show save-confirmed message
-     *     -set current user info throughout the site
-     */
+  /** on form submit:
+   * - attempt save to backend & report any errors
+   * - if successful
+   *   - clear previous error messages and password
+   *   - show save-confirmed message
+   *   - set current user info throughout the site
+   */
 
-    async function handleSubmit ( e )
-    {
-        e.preventDefault();
+  async function handleSubmit(evt) {
+    evt.preventDefault();
 
-        let profileData = {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            password: formData.password
-        };
+    let profileData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+    };
 
-        let username = formData.username;
-        let updatedUser;
+    let username = formData.username;
+    let updatedUser;
 
-        try
-        {
-            updatedUser = await JoblyApi.saveProfile( username, profileData );
-        } catch ( err )
-        {
-            debugger;
-            setFormErrors( err )
-            return;
-        }
-
-        setFormData( f => ( { ...f, password: "" } ) );
-        setFormErrors( [] );
-        setSaveConfirmed( true );
-
-        /**trigger reloading of user information throughout the site */
-        setCurrentUser( updatedUser );
+    try {
+      updatedUser = await JoblyApi.saveProfile(username, profileData);
+    } catch (errors) {
+      debugger;
+      setFormErrors(errors);
+      return;
     }
 
-    /**Handle form data changing */
-    const handleChange = ( e ) =>
-    {
-        const { name, value } = e.target;
-        setFormData( f => ( {
-            ...f,
-            [ name ]: value
-        } ) );
-        setFormErrors( [] );
-    }
+    setFormData(f => ({ ...f, password: "" }));
+    setFormErrors([]);
+    setSaveConfirmed(true);
 
-    return (
-        <div className="col-md-6 col-lg-4 offset-md-3 offset-lg-4">
-            <h3>Profile</h3>
-            <div className="card">
-                <div className="card-body">
-                    <form>
-                        <div className="form-group">
-                            <label>Username</label>
-                            <p className="form-control-plaintext">{formData.username}</p>
-                        </div>
+    // trigger reloading of user information throughout the site
+    setCurrentUser(updatedUser);
+  }
 
-                        <div className="form-group">
-                            <label>First Name</label>
-                            <input
-                                name="firstname"
-                                className="form-control"
-                                value={formData.firstName}
-                                onChange={handleChange}
-                            />
-                        </div>
+  /** Handle form data changing */
+  function handleChange(evt) {
+    const { name, value } = evt.target;
+    setFormData(f => ({
+      ...f,
+      [name]: value,
+    }));
+    setFormErrors([]);
+  }
 
-                        <div className="form-group">
-                            <label>Last Name</label>
-                            <input
-                                name="lastname"
-                                className="form-control"
-                                value={formData.lastName}
-                                onChange={handleChange}
-                            />
-                        </div>
+  return (
+      <div className="col-md-6 col-lg-4 offset-md-3 offset-lg-4">
+        <h3>Profile</h3>
+        <div className="card">
+          <div className="card-body">
+            <form>
+              <div className="form-group">
+                <label>Username</label>
+                <p className="form-control-plaintext">{formData.username}</p>
+              </div>
+              <div className="form-group">
+                <label>First Name</label>
+                <input
+                    name="firstName"
+                    className="form-control"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Last Name</label>
+                <input
+                    name="lastName"
+                    className="form-control"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                    name="email"
+                    className="form-control"
+                    value={formData.email}
+                    onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Confirm password to make changes:</label>
+                <input
+                    type="password"
+                    name="password"
+                    className="form-control"
+                    value={formData.password}
+                    onChange={handleChange}
+                />
+              </div>
 
-                        <div className="form-group">
-                            <label>Email</label>
-                            <input
-                                name="email"
-                                className="form-control"
-                                value={formData.email}
-                                onChange={handleChange}
-                            />
-                        </div>
+              {formErrors.length
+                  ? <Alert type="danger" messages={formErrors} />
+                  : null}
 
-                        <div className="form-group">
-                            <label>Confirm password to make changes:</label>
-                            <input
-                                type="password"
-                                name="password"
-                                className="form-control"
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-                        </div>
+              {saveConfirmed
+                  ?
+                  <Alert type="success" messages={["Updated successfully."]} />
+                  : null}
 
-                        {formErrors.length
-                            ? <Alert type="danger" messages={formErrors} />
-                            : null}
-                        
-                        {saveConfirmed
-                            ? <Alert type="success" messages={[ "Updated successfully." ]} />
-                            : null}
-                        
-                        <button
-                            className="btn btn-primary btn-block mt-4"
-                            onClick={handleSubmit}
-                        >
-                            Save changes
-                        </button>
-                    </form>
-                </div>
-            </div>
+              <button
+                  className="btn btn-primary btn-block mt-4"
+                  onClick={handleSubmit}
+              >
+                Save Changes
+              </button>
+            </form>
+          </div>
         </div>
-    );
+      </div>
+  );
 }
 
 export default ProfileForm;
